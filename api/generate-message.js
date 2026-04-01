@@ -25,6 +25,8 @@ Kategoriinngang: ${keywords}
 
 Krav til budskapet:
 - Treff følelser – skriv om drømmer, håp, livsøyeblikk, trygghet, frihet eller stolthet
+- Bygg på menneskelig innsikt – vis at du forstår hvordan folk egentlig tenker, føler og lever, ikke bare hva de trenger av et bankprodukt
+- Vær menneskelig – skriv som et menneske til et menneske, med varme og ekthet
 - Unngå bankspråk og rasjonelle produktfordeler – snakk til hjertet, ikke hodet
 - Kreativt og uventet – unngå klisjeer som "ta steget" eller "din fremtid starter her"
 - Egnet for banner og markedsmateriell
