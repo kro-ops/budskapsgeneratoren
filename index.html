@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budskapsgeneratoren</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a1628 0%, #0d2144 50%, #0a3060 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header .emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 10px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 20px rgba(100, 180, 255, 0.4);
+    }
+
+    header p {
+      color: #7aaed4;
+      font-size: 1rem;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 620px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .field-label {
+      color: #7aaed4;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .field {
+      margin-bottom: 20px;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      padding: 10px 16px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237aaed4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+      cursor: pointer;
+    }
+
+    select option {
+      background: #0d2144;
+      color: #fff;
+    }
+
+    input[type="text"]::placeholder {
+      color: #3a5878;
+    }
+
+    select:focus, select:hover,
+    input[type="text"]:focus, input[type="text"]:hover {
+      border-color: rgba(100, 180, 255, 0.5);
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .length-toggle {
+      display: flex;
+      gap: 10px;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.08);
+      color: #7aaed4;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .toggle-btn.active {
+      background: linear-gradient(135deg, #1a6fb5, #0d9488);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(13, 148, 136, 0.3);
+    }
+
+    .toggle-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .output-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .output-box.flash {
+      animation: flash 0.35s ease;
+    }
+
+    @keyframes flash {
+      0% { opacity: 1; }
+      30% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .output-text {
+      color: #f0f4f8;
+      font-size: 1.2rem;
+      line-height: 1.7;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .output-text.placeholder {
+      color: #2a4a6a;
+      font-style: italic;
+      font-size: 1rem;
+      font-weight: 400;
+    }
+
+    .product-badge {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: linear-gradient(90deg, #1a6fb5, #0d9488);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .product-badge.visible {
+      opacity: 1;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    button.btn-generate {
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #1a6fb5, #0d9488);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(13, 148, 136, 0.35);
+    }
+
+    button.btn-generate:hover {
+      box-shadow: 0 6px 28px rgba(13, 148, 136, 0.5);
+    }
+
+    button.btn-generate:active {
+      transform: scale(0.97);
+    }
+
+    button.btn-generate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      color: #7aaed4;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .btn-copy.copied {
+      background: rgba(50, 200, 120, 0.2);
+      color: #5eead4;
+      border-color: rgba(94, 234, 212, 0.3);
+    }
+
+    footer {
+      margin-top: 32px;
+      color: #1e3a5a;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 28px 20px;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn-copy {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="emoji">💡</span>
+    <h1>Budskapsgeneratoren</h1>
+    <p>Kreative bankbudskap på sekunder.</p>
+  </header>
+
+  <div class="card">
+
+    <div class="field">
+      <label class="field-label" for="productSelect">Produktområde</label>
+      <select id="productSelect">
+        <option value="Aksjer">Aksjer</option>
+        <option value="Billån">Billån</option>
+        <option value="Boliglån">Boliglån</option>
+        <option value="BSU">BSU</option>
+        <option value="Fond">Fond</option>
+        <option value="Kredittkort">Kredittkort</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="keywords">Stikkord</label>
+      <input type="text" id="keywords" placeholder="F.eks. frihet, trygghet, drømmebolig…" maxlength="100" />
+    </div>
+
+    <div class="field">
+      <label class="field-label">Lengde</label>
+      <div class="length-toggle">
+        <div class="toggle-btn active" id="btnKort" onclick="velgLengde('kort')">Kort <span style="opacity:0.6;font-weight:400">(5–10 ord)</span></div>
+        <div class="toggle-btn" id="btnLangt" onclick="velgLengde('langt')">Langt <span style="opacity:0.6;font-weight:400">(10–15 ord)</span></div>
+      </div>
+    </div>
+
+    <div class="output-box" id="outputBox">
+      <span class="product-badge" id="productBadge"></span>
+      <p class="output-text placeholder" id="outputText">Fyll inn stikkord og trykk generer.</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-generate" id="generateBtn" onclick="genererBudskap()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Generer budskap
+      </button>
+      <button class="btn-copy" id="copyBtn" onclick="kopierBudskap()" title="Kopier budskapet">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Kopier
+      </button>
+    </div>
+
+  </div>
+
+  <footer>Laget med glede &mdash; og litt kreativitet.</footer>
+
+  <script>
+    let valgtLengde = 'kort';
+    let aktivtBudskap = null;
+
+    function velgLengde(lengde) {
+      valgtLengde = lengde;
+      document.getElementById('btnKort').classList.toggle('active', lengde === 'kort');
+      document.getElementById('btnLangt').classList.toggle('active', lengde === 'langt');
+    }
+
+    async function genererBudskap() {
+      const produkt = document.getElementById('productSelect').value;
+      const stikkord = document.getElementById('keywords').value.trim();
+      const outputText = document.getElementById('outputText');
+      const outputBox = document.getElementById('outputBox');
+      const badge = document.getElementById('productBadge');
+      const btn = document.getElementById('generateBtn');
+
+      if (!stikkord) {
+        outputText.className = 'output-text placeholder';
+        outputText.textContent = 'Skriv inn noen stikkord først!';
+        return;
+      }
+
+      btn.disabled = true;
+      outputText.className = 'output-text';
+      outputText.textContent = 'Genererer budskap…';
+      badge.classList.remove('visible');
+
+      try {
+        const response = await fetch('/api/generate-message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product: produkt, keywords: stikkord, length: valgtLengde })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.error || 'Ukjent feil');
+
+        outputBox.classList.remove('flash');
+        void outputBox.offsetWidth;
+        outputBox.classList.add('flash');
+
+        outputText.className = 'output-text';
+        outputText.textContent = data.message;
+        aktivtBudskap = data.message;
+
+        badge.textContent = produkt;
+        badge.classList.add('visible');
+
+        const copyBtn = document.getElementById('copyBtn');
+        copyBtn.classList.remove('copied');
+        copyBtn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopier`;
+
+      } catch (err) {
+        outputText.className = 'output-text placeholder';
+        outputText.textContent = 'Noe gikk galt. Prøv igjen.';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function kopierBudskap() {
+      if (!aktivtBudskap) return;
+      navigator.clipboard.writeText(aktivtBudskap).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kopiert!`;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopier`;
+        }, 2500);
+      });
+    }
+
+    document.getElementById('keywords').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') genererBudskap();
+    });
+  </script>
+
+</body>
+</html>
