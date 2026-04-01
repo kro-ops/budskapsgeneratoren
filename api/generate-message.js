@@ -18,15 +18,18 @@ module.exports = async function handler(req, res) {
 
   const ordLengde = length === 'langt' ? '10–15 ord' : '5–10 ord';
 
-  const prompt = `Du er en kreativ tekstforfatter for en norsk bank. Skriv ett markedsbudskap for produktet "${product}".
+  const prompt = `Du er en prisvinnende kreativ tekstforfatter for en norsk bank. Skriv ett emosjonelt markedsbudskap for produktet "${product}".
 
-Stikkord: ${keywords}
+Kategoriinngang: ${keywords}
 Ønsket lengde: ${ordLengde}
 
 Krav til budskapet:
-- Kreativt, emosjonelt og kommersielt – egnet for banner og markedsmateriell
-- Varm, moderne og tillitvekkende tone of voice
-- Følger markedsføringsloven: ingen villedende påstander, ingen garanterte avkastningsløfter, ingen urimelig press
+- Treff følelser – skriv om drømmer, håp, livsøyeblikk, trygghet, frihet eller stolthet
+- Unngå bankspråk og rasjonelle produktfordeler – snakk til hjertet, ikke hodet
+- Kreativt og uventet – unngå klisjeer som "ta steget" eller "din fremtid starter her"
+- Egnet for banner og markedsmateriell
+- Varm, moderne og menneskelig tone of voice
+- Følger markedsføringsloven: ingen villedende påstander, ingen garanterte avkastningsløfter
 - Nøyaktig ${ordLengde} langt
 
 Svar kun med selve budskapet. Ingen anførselstegn, ingen forklaring.`;
