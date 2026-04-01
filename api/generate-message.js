@@ -18,23 +18,26 @@ module.exports = async function handler(req, res) {
 
   const ordLengde = length === 'langt' ? '10–15 ord' : '5–10 ord';
 
-  const prompt = `Du er en prisvinnende kreativ tekstforfatter for en norsk bank. Skriv ett emosjonelt markedsbudskap for produktet "${product}".
+  const prompt = `Du er en prisvinnende kreativ tekstforfatter for en norsk bank. Skriv 3 ulike emosjonelle markedsbudskap for produktet "${product}".
 
 Kategoriinngang: ${keywords}
-Ønsket lengde: ${ordLengde}
+Ønsket lengde per budskap: ${ordLengde}
 
-Krav til budskapet:
+Krav til hvert budskap:
+- Direkte relatert til kategoriinngangen – la stikkordene forme budskapet konkret
 - Treff følelser – skriv om drømmer, håp, livsøyeblikk, trygghet, frihet eller stolthet
-- Bygg på menneskelig innsikt – vis at du forstår hvordan folk egentlig tenker, føler og lever, ikke bare hva de trenger av et bankprodukt
+- Bygg på menneskelig innsikt – vis at du forstår hvordan folk egentlig tenker, føler og lever
 - Vær menneskelig – skriv som et menneske til et menneske, med varme og ekthet
 - Unngå bankspråk og rasjonelle produktfordeler – snakk til hjertet, ikke hodet
-- Kreativt og uventet – unngå klisjeer som "ta steget" eller "din fremtid starter her"
+- Kreativt og uventet – de 3 budskapene skal ha tydelig ulik vinkel og tone
 - Egnet for banner og markedsmateriell
-- Varm, moderne og menneskelig tone of voice
 - Følger markedsføringsloven: ingen villedende påstander, ingen garanterte avkastningsløfter
 - Nøyaktig ${ordLengde} langt
 
-Svar kun med selve budskapet. Ingen anførselstegn, ingen forklaring.`;
+Svar med nøyaktig dette formatet – tre linjer, én per budskap, ingen nummerering, ingen anførselstegn:
+BUDSKAP1
+BUDSKAP2
+BUDSKAP3`;
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -45,7 +48,7 @@ Svar kun med selve budskapet. Ingen anførselstegn, ingen forklaring.`;
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 128,
+      max_tokens: 400,
       messages: [{ role: 'user', content: prompt }]
     })
   });
@@ -56,5 +59,8 @@ Svar kun med selve budskapet. Ingen anførselstegn, ingen forklaring.`;
   }
 
   const data = await response.json();
-  res.status(200).json({ message: data.content[0].text.trim() });
+  const raw = data.content[0].text.trim();
+  const messages = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0).slice(0, 3);
+
+  res.status(200).json({ messages });
 };

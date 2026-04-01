@@ -184,24 +184,89 @@
       font-weight: 400;
     }
 
-    .product-badge {
-      position: absolute;
-      top: -10px;
-      left: 20px;
-      background: linear-gradient(90deg, #1a6fb5, #0d9488);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      opacity: 0;
-      transition: opacity 0.3s;
+    .results {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
     }
 
-    .product-badge.visible {
-      opacity: 1;
+    .results.visible {
+      display: flex;
+    }
+
+    .result-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      animation: flash 0.4s ease;
+    }
+
+    .result-number {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #28b482;
+      background: rgba(40, 180, 130, 0.12);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .result-text {
+      color: #f0f4f8;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .result-copy {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #a5e1d2;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .result-copy:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .result-copy.copied {
+      background: rgba(40, 180, 130, 0.2);
+      color: #28b482;
+      border-color: rgba(40, 180, 130, 0.3);
+    }
+
+    .loading-box {
+      display: none;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      text-align: center;
+      color: #a5e1d2;
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+
+    .loading-box.visible {
+      display: block;
     }
 
     .actions {
@@ -328,19 +393,14 @@
       </div>
     </div>
 
-    <div class="output-box" id="outputBox">
-      <span class="product-badge" id="productBadge"></span>
-      <p class="output-text placeholder" id="outputText">Fyll inn stikkord og trykk generer.</p>
-    </div>
+    <div class="loading-box" id="loadingBox">Genererer budskap…</div>
+
+    <div class="results" id="results"></div>
 
     <div class="actions">
       <button class="btn-generate" id="generateBtn" onclick="genererBudskap()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         Generer budskap
-      </button>
-      <button class="btn-copy" id="copyBtn" onclick="kopierBudskap()" title="Kopier budskapet">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        Kopier
       </button>
     </div>
 
@@ -350,7 +410,6 @@
 
   <script>
     let valgtLengde = 'kort';
-    let aktivtBudskap = null;
 
     function velgLengde(lengde) {
       valgtLengde = lengde;
@@ -361,21 +420,22 @@
     async function genererBudskap() {
       const produkt = document.getElementById('productSelect').value;
       const stikkord = document.getElementById('keywords').value.trim();
-      const outputText = document.getElementById('outputText');
-      const outputBox = document.getElementById('outputBox');
-      const badge = document.getElementById('productBadge');
       const btn = document.getElementById('generateBtn');
+      const loading = document.getElementById('loadingBox');
+      const results = document.getElementById('results');
 
       if (!stikkord) {
-        outputText.className = 'output-text placeholder';
-        outputText.textContent = 'Skriv inn noen stikkord først!';
+        loading.textContent = 'Skriv inn kategoriinngang først!';
+        loading.classList.add('visible');
+        results.classList.remove('visible');
         return;
       }
 
       btn.disabled = true;
-      outputText.className = 'output-text';
-      outputText.textContent = 'Genererer budskap…';
-      badge.classList.remove('visible');
+      loading.textContent = 'Genererer budskap…';
+      loading.classList.add('visible');
+      results.classList.remove('visible');
+      results.innerHTML = '';
 
       try {
         const response = await fetch('/api/generate-message', {
@@ -385,41 +445,37 @@
         });
 
         const data = await response.json();
-
         if (!response.ok) throw new Error(data.error || 'Ukjent feil');
 
-        outputBox.classList.remove('flash');
-        void outputBox.offsetWidth;
-        outputBox.classList.add('flash');
+        loading.classList.remove('visible');
 
-        outputText.className = 'output-text';
-        outputText.textContent = data.message;
-        aktivtBudskap = data.message;
+        data.messages.forEach((msg, i) => {
+          const card = document.createElement('div');
+          card.className = 'result-card';
+          card.innerHTML = `
+            <div class="result-number">${i + 1}</div>
+            <div class="result-text">${msg}</div>
+            <button class="result-copy" onclick="kopier(this, '${msg.replace(/'/g, "\\'")}')">Kopier</button>
+          `;
+          results.appendChild(card);
+        });
 
-        badge.textContent = produkt;
-        badge.classList.add('visible');
-
-        const copyBtn = document.getElementById('copyBtn');
-        copyBtn.classList.remove('copied');
-        copyBtn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopier`;
+        results.classList.add('visible');
 
       } catch (err) {
-        outputText.className = 'output-text placeholder';
-        outputText.textContent = 'Noe gikk galt. Prøv igjen.';
+        loading.textContent = 'Noe gikk galt. Prøv igjen.';
       } finally {
         btn.disabled = false;
       }
     }
 
-    function kopierBudskap() {
-      if (!aktivtBudskap) return;
-      navigator.clipboard.writeText(aktivtBudskap).then(() => {
-        const btn = document.getElementById('copyBtn');
+    function kopier(btn, tekst) {
+      navigator.clipboard.writeText(tekst).then(() => {
+        btn.textContent = 'Kopiert!';
         btn.classList.add('copied');
-        btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kopiert!`;
         setTimeout(() => {
+          btn.textContent = 'Kopier';
           btn.classList.remove('copied');
-          btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopier`;
         }, 2500);
       });
     }
