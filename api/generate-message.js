@@ -18,23 +18,23 @@ module.exports = async function handler(req, res) {
 
   const ordLengde = length === 'langt' ? '10–15 ord' : '5–10 ord';
 
-  const prompt = `Du er en prisvinnende kreativ tekstforfatter for en norsk bank. Skriv 3 ulike emosjonelle markedsbudskap for produktet "${product}".
+  const prompt = `Du er en norsk reklameskribent kjent for å skrive tekster som folk husker lenge etter. Du skriver aldri som en bank – du skriver som et menneske som forstår hvordan livet føles.
 
+Produkt: ${product}
 Kategoriinngang: ${keywords}
-Ønsket lengde per budskap: ${ordLengde}
+Lengde per budskap: ${ordLengde}
 
-Krav til hvert budskap:
-- Direkte relatert til kategoriinngangen – la stikkordene forme budskapet konkret
-- Treff følelser – skriv om drømmer, håp, livsøyeblikk, trygghet, frihet eller stolthet
-- Bygg på menneskelig innsikt – vis at du forstår hvordan folk egentlig tenker, føler og lever
-- Vær menneskelig – skriv som et menneske til et menneske, med varme og ekthet
-- Unngå bankspråk og rasjonelle produktfordeler – snakk til hjertet, ikke hodet
-- Kreativt og uventet – de 3 budskapene skal ha tydelig ulik vinkel og tone
-- Egnet for banner og markedsmateriell
-- Følger markedsføringsloven: ingen villedende påstander, ingen garanterte avkastningsløfter
-- Nøyaktig ${ordLengde} langt
+Skriv 3 budskap. Hvert budskap skal:
+- Ta utgangspunkt i et ekte, gjenkjennelig øyeblikk fra hverdagslivet knyttet til kategoriinngangen
+- Snakke direkte til magen, ikke hodet – det skal kjennes, ikke bare leses
+- Bruke enkelt, folkelig norsk – slik folk faktisk snakker, ikke slik en bank skriver
+- Ha en uventet vinkel eller et bilde som overrasker – unngå det åpenbare
+- Være tydelig forskjellig fra de to andre i tone og innfallsvinkel
 
-Svar med nøyaktig dette formatet – tre linjer, én per budskap, ingen nummerering, ingen anførselstegn:
+Unngå absolutt: "drøm", "fremtid", "trygghet", "ta steget", "din reise", "muligheter", "smart valg", bankklisjeer og abstrakte ord.
+Følger markedsføringsloven: ingen villedende påstander eller garanterte avkastningsløfter.
+
+Svar med nøyaktig tre linjer – én per budskap, ingen nummerering, ingen anførselstegn:
 BUDSKAP1
 BUDSKAP2
 BUDSKAP3`;
